@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: pulseliveview-backend
   labels:
-    app: pulseliveview-backend
+    app: pulseview-backend
 spec:
   selector:
-    app: pulseliveview-backend
+    app: pulseview-backend
   ports:
     - protocol: TCP
       port: 8000
