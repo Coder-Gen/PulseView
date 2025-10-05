@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pulseview-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pulseview-ui
+  template:
+    metadata:
+      labels:
+        app: pulseview-ui
+    spec:
+      containers:
+      - name: frontend
+        image: ghcr.io/coder-gen/pulseview-ui:v1
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "400m"
+            memory: "512Mi"

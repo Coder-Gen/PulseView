@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pulseview-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pulseview-backend
+  template:
+    metadata:
+      labels:
+        app: pulseview-backend
+    spec:
+      containers:
+      - name: backend
+        image: ghcr.io/coder-gen/pulseview-backend:v1
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DB_HOST
+          value: "10.105.16.22"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "postgress"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: password
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 2
+          periodSeconds: 5
+          timeoutSeconds: 1
+          failureThreshold: 1
+        resources:
+          requests:
+            cpu: "300m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
