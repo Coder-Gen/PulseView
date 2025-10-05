@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pulseliveview-backend
+  labels:
+    app: pulseliveview-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pulseliveview-backend
+  template:
+    metadata:
+      labels:
+        app: pulseliveview-backend
+    spec:
+      containers:
+        - name: backend
+          image: gcr.io/coder-gen/userview-backend:v1
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DB_HOST
+              value: "10.105.16.22"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "postgress"
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: password
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 25
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 1
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pulseliveview-backend
+spec:
+  selector:
+    app: pulseliveview-backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP
